@@ -1,0 +1,30 @@
+netty-demo  D:\netty-demo
+  .idea
+  src
+    main
+      java
+      resources
+        logback.xml
+    test
+      java
+        com.zut.wwl
+          ByteBufferUtil
+          TestByteBuffer
+          TestByteBufferAllocate
+          TestByteBufferExam
+          TestByteBufferRead
+          TestByteBufferReadWrite
+          TestByteBufferString
+          TestFileChannelTransferTo
+          TestFileCopy
+          TestFileWalkFileTree
+          TestGatheringRead
+          TestScatteringReads
+  target
+  data.txt
+  dataTo.txt
+  myApp.log
+  pom.xml
+  word2.txt
+外部库
+临时文件和控制台
