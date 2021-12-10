@@ -1,20 +1,21 @@
 package com.zut.wwl.c4;
 
-
-
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
 
-@Slf4j
-public class Client {
+public class WriteClient {
     public static void main(String[] args) throws IOException {
         SocketChannel sc = SocketChannel.open();
         sc.connect(new InetSocketAddress("localhost",8080));
-        sc.write(Charset.defaultCharset().encode("helloasdfghjkl;\nworld\n"));
-        log.debug("waiting.....");
+        int count = 0;
+//        接收数据
+        while (true){
+            ByteBuffer buffer = ByteBuffer.allocate(1024*1024);
+            count += sc.read(buffer);
+            System.out.println(count);
+            buffer.clear();
+        }
     }
 }
