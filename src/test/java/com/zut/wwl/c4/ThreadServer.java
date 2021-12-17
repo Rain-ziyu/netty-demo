@@ -8,11 +8,12 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.zut.wwl.c1_c3.ByteBufferUtil.debugAll;
 
 @Slf4j
-public class MultiThreadServer {
+public class ThreadServer {
     public static void main(String[] args) throws IOException {
         Thread.currentThread().setName("boss");
         ServerSocketChannel ssc = ServerSocketChannel.open();
@@ -21,9 +22,13 @@ public class MultiThreadServer {
         SelectionKey bossKey = ssc.register(boss, 0, null);
         bossKey.interestOps(SelectionKey.OP_ACCEPT);
         ssc.bind(new InetSocketAddress(8080));
-//        创建固定数量的worker
-        Worker worker = new Worker("work-0");
-
+//        创建固定数量的worker并初始化
+//        动态获取线程数 Runtime.getRuntime().availableProcessors() 但是如果是在docker容器下，因为容器不是物理隔离的，会拿到物理cpu个数
+        Worker[] workers = new Worker[Runtime.getRuntime().availableProcessors()];
+        for (int i = 0;i<workers.length;i++){
+            workers[i] = new Worker("worker-"+i);
+        }
+        AtomicInteger index = new AtomicInteger();
         while (true) {
             boss.select();
             Iterator<SelectionKey> iter = boss.selectedKeys().iterator();
@@ -36,7 +41,8 @@ public class MultiThreadServer {
                     log.debug("connected register...{}", sc.getRemoteAddress());
 //                    2.关联 selector
                     log.debug("before register...{}", sc.getRemoteAddress());
-                    worker.register(sc);
+//                    round robin 轮询
+                    workers[index.getAndIncrement()%workers.length].register(sc);
                     log.debug("after register...{}", sc.getRemoteAddress());
                 }
 
